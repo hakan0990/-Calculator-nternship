@@ -1,0 +1,135 @@
+﻿@{	ViewData["Title"] = "Index";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.11.0/dist/sweetalert2.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css" />
+<div class="box">
+	<div class="display"><input type="text" size="18" id="sonuc"></div>
+		<div class="keys">
+		<p>
+			<input type="button" class="button gray" value="C" onclick='$("#sonuc").val("")'>
+			<input type="button" class="button gray" value="m-" onclick='c("")'>
+			<input type="button" class="button gray" value="m+" onclick='c("")'>
+			<input type="button" class="button pink" value="/" onclick='hesapla("/")'>
+		</p>
+		<p>
+			<input type="button" class="button black" value="7" onclick='asdasd("7")'>
+			<input type="button" class="button black" value="8" onclick='asdasd("8")'>
+			<input type="button" class="button black" value="9" onclick='asdasd("9")'>
+			<input type="button" class="button pink" value="*" onclick='hesapla("*")'>
+		</p>
+		<p>
+			<input type="button" class="button black" value="4" onclick='asdasd("4")'>
+			<input type="button" class="button black" value="5" onclick='asdasd("5")'>
+			<input type="button" class="button black" value="6" onclick='asdasd("6")'>
+			<input type="button" class="button pink" value="-" onclick='hesapla("-")'>
+		</p>
+		<p>
+			<input type="button" class="button black" value="1" onclick='asdasd("1")'>
+			<input type="button" class="button black" value="2" onclick='asdasd("2")'>
+			<input type="button" class="button black" value="3" onclick='asdasd("3")'>
+			<input type="button" class="button pink" value="+" onclick=hesapla("+")>
+		</p>
+		<p>
+			<input type="button" class="button black" value="0" onclick='v("0")'>
+			<input type="button" class="button black" value="." onclick='v(".")'>
+			<input type="button" class="button black" value="C" onclick='c("")'>
+			<input type="button" class="button orange" value="=" onclick='topla()'>
+		</p>
+	</div>
+</div>
+
+<table id="records" class="display" style="width:100%">
+	<thead>
+		<tr>
+			<th>ID</th>
+			<th>Ad</th>
+			<th>Sonuç Değeri</th>
+			<th>IsActive</th>
+			<th>NumerosOrdo</th>
+			<th>NumerosOrdo2</th>
+
+		</tr>
+	</thead>
+	<tbody>
+	</tbody>
+	<tfoot>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		</tfoot class="pb-5">
+</table>
+<button id="btn-reload" style="display:none"></button>
+<br />
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.11.0/dist/sweetalert2.all.min.js"></script>
+<script>
+	$(document).ready(function () {
+		var table = $('#records').DataTable({
+			ajax: {
+				url: '/LoginPage/GetAll', // Ajax isteği yapılacak URL
+				type: 'GET',         // GET isteği123
+				dataType: 'json',    // Gelen veri tipi JSON
+			},
+			columns: [
+				{ data: 'loginID', name: 'loginID', searchable: true, autoWidth: true },
+				{ data: 'loginPassword', name: 'loginPassword', searchable: true, autoWidth: true },
+				{ data: 'Adres', name: 'Adres', searchable: true, autoWidth: true },
+				{ data: 'Ad', name: 'Ad', searchable: true, autoWidth: true },
+				{ data: 'Soyad', name: 'Soyad', searchable: true, autoWidth: true },
+				{ data: 'Email', name: 'Email', searchable: true, autoWidth: true },
+				{ data: 'TelefonNo', name: 'TelefonNo', searchable: true, autoWidth: true }
+			]
+		});
+
+		$('#btn-reload').on('click', function () {
+			table.ajax.reload(); // Tabloyu yenilemek için Ajax isteği yap
+		});
+	});
+</script>
+
+<script>
+	function hesapla(opr) {
+		var islem = $("#sonuc").val();
+		var data = JSON.stringify({ islem: islem, oprtr: opr });
+		$.ajax({
+			type: "POST",
+			contentType: "application/json; charset=utf-8",
+			url: "/Home/islemNe",
+			data: data,
+			success: function (data) {
+				if (data.success) {
+					$("#sonuc").val(data.sonuc);
+					Swal.fire({
+						title: "Başarılı!",
+						text: "Sonuç hesaplandı",
+						icon: "success"
+					});
+					$("#btn-reload").click();
+				} else {
+					Swal.fire({
+						title: "Uyarı!",
+						text: data.message,
+						icon: "warning"
+					});
+				}
+			},
+			error: function (result) {
+				Swal.fire({
+					title: "İşlem Gerçekleşmedi",
+					text: data.message,
+					icon: "warning"
+				});
+			}
+		});
+	}
+	function asdasd(sayi) {
+		var mevcut = $("#sonuc").val();
+		$("#sonuc").val(mevcut + sayi);
+	}
+</script>
